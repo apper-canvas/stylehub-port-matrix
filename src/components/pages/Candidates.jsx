@@ -295,11 +295,11 @@ Add Candidate
       />
 
       {/* Add Candidate Modal */}
-      <CandidateProfileModal
+<CandidateProfileModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onSave={handleAddCandidate}
-        mode="add"
+        mode="create"
       />
     </div>
   );
