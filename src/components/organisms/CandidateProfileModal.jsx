@@ -11,80 +11,75 @@ import Textarea from "@/components/atoms/Textarea";
 import Badge from "@/components/atoms/Badge";
 import Input from "@/components/atoms/Input";
 import Button from "@/components/atoms/Button";
-const CandidateProfileModal = ({ 
+
+const experienceLevels = [
+  { value: 'entry', label: 'Entry Level (0-2 years)' },
+  { value: 'mid', label: 'Mid Level (3-5 years)' },
+  { value: 'senior', label: 'Senior Level (6-10 years)' },
+  { value: 'lead', label: 'Lead/Principal (10+ years)' }
+]
+
+const availabilityOptions = [
+  { value: 'available', label: 'Available', color: 'text-green-600 bg-green-50' },
+  { value: 'busy', label: 'Busy', color: 'text-yellow-600 bg-yellow-50' },
+  { value: 'unavailable', label: 'Unavailable', color: 'text-red-600 bg-red-50' }
+]
+
+function CandidateProfileModal({ 
   isOpen, 
   onClose, 
   onSave, 
-  candidate = null, 
-  mode = "add", // "add", "view", or "edit"
-  candidateApplications = [],
+  candidate, 
+  jobs = [], 
+  applications = [],
+  onStatusChange,
   onApplicationUpdate,
-  onStatusChange
-}) => {
-const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    location: "",
-    currentJobTitle: "",
-    experienceLevel: "entry",
-    skills: [],
-    resumeSummary: "",
-    availability: "available",
-    position: ""
+  mode = 'view' // 'view', 'edit', 'create'
+}) {
+  // Early return if candidate is required but null (for view/edit modes)
+  if (!candidate && mode !== 'create') {
+    return null;
+  }
+
+// State management
+  const [formData, setFormData] = useState({
+    name: candidate?.name ?? '',
+    email: candidate?.email ?? '',
+    phone: candidate?.phone ?? '',
+    location: candidate?.location ?? '',
+    currentJobTitle: candidate?.currentJobTitle ?? '',
+    position: candidate?.position ?? '',
+    experienceLevel: candidate?.experienceLevel ?? 'entry',
+    skills: candidate?.skills ?? [],
+    resumeSummary: candidate?.resumeSummary ?? '',
+    availability: candidate?.availability ?? 'available'
   });
-  
+
   const [errors, setErrors] = useState({});
+  const [newSkill, setNewSkill] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [newSkill, setNewSkill] = useState("");
   const [showInterviewModal, setShowInterviewModal] = useState(false);
   const [selectedApplicationId, setSelectedApplicationId] = useState(null);
-  const experienceLevels = [
-    { value: "entry", label: "Entry Level (0-2 years)" },
-    { value: "mid", label: "Mid Level (3-5 years)" },
-    { value: "senior", label: "Senior Level (6-10 years)" },
-    { value: "lead", label: "Lead Level (10+ years)" }
-  ];
-
-  const availabilityOptions = [
-    { value: "available", label: "Available", color: "text-green-600 bg-green-50" },
-    { value: "busy", label: "Busy", color: "text-yellow-600 bg-yellow-50" },
-    { value: "unavailable", label: "Unavailable", color: "text-red-600 bg-red-50" }
-  ];
+  const [candidateApplications, setCandidateApplications] = useState(applications);
 
   useEffect(() => {
-if (candidate && (mode === "view" || mode === "edit")) {
+    if (candidate && (mode === "view" || mode === "edit")) {
       setFormData({
         name: candidate.name || "",
         email: candidate.email || "",
         phone: candidate.phone || "",
         location: candidate.location || "",
-        currentJobTitle: candidate.currentJobTitle || candidate.position || "",
+        currentJobTitle: candidate.currentJobTitle || "",
+        position: candidate.position || "",
         experienceLevel: candidate.experienceLevel || "entry",
         skills: candidate.skills || [],
         resumeSummary: candidate.resumeSummary || "",
-        availability: candidate.availability || "available",
-        position: candidate.position || ""
-      });
-    } else if (mode === "add") {
-      // Reset form for new candidate
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        location: "",
-        currentJobTitle: "",
-        experienceLevel: "entry",
-        skills: [],
-        resumeSummary: "",
-        availability: "available",
-        position: ""
+        availability: candidate.availability || "available"
       });
     }
-    setErrors({});
-  }, [candidate, mode, isOpen]);
-
-  const validateForm = () => {
+    setCandidateApplications(applications);
+  }, [candidate, applications, mode]);
+const validateForm = () => {
     const newErrors = {};
     
     if (!formData.name.trim()) {
@@ -125,7 +120,7 @@ if (candidate && (mode === "view" || mode === "edit")) {
     return Object.keys(newErrors).length === 0;
   };
 
-const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!validateForm()) {
@@ -134,44 +129,18 @@ const handleSubmit = async (e) => {
     }
 
     setIsSubmitting(true);
-    
     try {
-      const candidateData = {
-        ...formData,
-        status: mode === "add" ? "new" : (candidate?.status || "new")
-      };
-      
-      await onSave(candidateData);
+      await onSave(formData);
       toast.success(mode === "add" ? "Candidate added successfully!" : "Candidate updated successfully!");
       onClose();
     } catch (error) {
-      toast.error(error.message || "Failed to save candidate");
+      console.error('Error saving candidate:', error);
+      toast.error("Failed to save candidate. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleInterviewSchedule = (applicationId) => {
-    setSelectedApplicationId(applicationId);
-    setShowInterviewModal(true);
-  };
-
-  const handleScheduleInterview = async (interviewData) => {
-    try {
-      await applicationService.scheduleInterview(selectedApplicationId, interviewData);
-      toast.success("Interview scheduled successfully!");
-      setShowInterviewModal(false);
-      setSelectedApplicationId(null);
-      
-      // Refresh application data if onApplicationUpdate is provided
-      if (onApplicationUpdate) {
-        const updatedApplication = await applicationService.getById(selectedApplicationId);
-        onApplicationUpdate(selectedApplicationId, updatedApplication);
-      }
-    } catch (error) {
-      toast.error(error.message || "Failed to schedule interview");
-    }
-  };
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
@@ -187,7 +156,46 @@ const handleSubmit = async (e) => {
     }
   };
 
-  const handleAddSkill = () => {
+  const handleStatusChange = async (applicationId, newStatus) => {
+    try {
+      if (onStatusChange) {
+        await onStatusChange(applicationId, newStatus);
+      }
+      
+      setCandidateApplications(prev => 
+        prev.map(app => 
+          app.id === applicationId 
+            ? { ...app, status: newStatus }
+            : app
+        )
+      );
+      
+      toast.success("Application status updated successfully!");
+    } catch (error) {
+      console.error('Error updating status:', error);
+      toast.error("Failed to update status. Please try again.");
+    }
+  };
+
+  const handleInterviewSchedule = (applicationId) => {
+    setSelectedApplicationId(applicationId);
+    setShowInterviewModal(true);
+  };
+
+  const handleScheduleInterview = async (interviewData) => {
+    try {
+      if (onApplicationUpdate) {
+        await onApplicationUpdate(selectedApplicationId, interviewData);
+      }
+      toast.success("Interview scheduled successfully!");
+      setShowInterviewModal(false);
+      setSelectedApplicationId(null);
+    } catch (error) {
+      console.error('Error scheduling interview:', error);
+      toast.error("Failed to schedule interview. Please try again.");
+    }
+  };
+const handleAddSkill = () => {
     if (newSkill.trim() && !formData.skills.includes(newSkill.trim())) {
       setFormData(prev => ({
         ...prev,
@@ -208,7 +216,7 @@ const handleSubmit = async (e) => {
   const handleRemoveSkill = (skillToRemove) => {
     setFormData(prev => ({
       ...prev,
-skills: prev.skills.filter(skill => skill !== skillToRemove)
+      skills: prev.skills.filter(skill => skill !== skillToRemove)
     }));
   };
 
@@ -404,66 +412,67 @@ return (
                   </FormField>
                 </div>
 
-                {/* Communication Notes */}
+{/* Communication Notes */}
                 <div className="border-t border-gray-200 pt-6">
                   <NotesList
                     entityType="candidate"
-                    entityId={candidate.Id}
-                    entityName={candidate.name}
+                    entityId={candidate?.Id}
+                    entityName={candidate?.name}
                   />
                 </div>
 
                 {/* Application Status Management */}
-                {(mode === "view" || mode === "edit") && candidate && <div>
-                  <h3 className="text-lg font-semibold font-display text-gray-900 mb-4">Application Status</h3>
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-gray-700">Current Status:</span>
-                      <Badge
-                        variant={candidate.status === "new" ? "primary" : candidate.status === "interviewed" ? "secondary" : candidate.status === "hired" ? "active" : "inactive"}>
-                        {candidate.status}
-                      </Badge>
+{/* Application Status Management */}
+                {(mode === "view" || mode === "edit") && candidate && (
+                  <div>
+                    <div className="flex items-center gap-2 mb-4">
+                      <ApperIcon name="Briefcase" className="w-5 h-5 text-gray-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Application Status</h3>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-gray-700">Availability:</span>
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${getAvailabilityDisplay(formData.availability).color}`}>
-                        {getAvailabilityDisplay(formData.availability).label}
-                      </span>
-                    </div>
-                  </div>
-                  {/* Application Status Management */}
-                  {candidateApplications && candidateApplications.length > 0 && <div className="space-y-4">
-                    <h4 className="text-base font-medium text-gray-900">Applications</h4>
-                    {candidateApplications.map(
-                      application => <div key={application.Id} className="border border-gray-200 rounded-lg p-4">
+                    
+                    {candidateApplications?.map(application => (
+                      <div key={application?.id} className="border border-gray-200 rounded-lg p-4 mb-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <div>
+                            <h4 className="font-medium text-gray-900">{application?.jobTitle}</h4>
+                            <p className="text-sm text-gray-600">{application?.company}</p>
+                          </div>
+                          <Badge 
+                            variant={application?.status === 'hired' ? 'success' : 
+                                   application?.status === 'rejected' ? 'danger' : 'primary'}
+                          >
+                            {application?.status?.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                          </Badge>
+                        </div>
+                        
                         <ApplicationStatusPipeline
-                          currentStatus={application.status}
-                          onStatusChange={onStatusChange}
-                          applicationId={application.Id}
-                          showUpdateDropdown={true}
-                          onInterviewSchedule={handleInterviewSchedule} />
-                        <div className="mt-3 pt-3 border-t border-gray-100">
-                          <p className="text-sm text-gray-600">
-                            <span className="font-medium">Applied to:</span> {application.jobTitle || "Unknown Position"}
-                          </p>
-                          <p className="text-sm text-gray-500 mt-1">Applied on {new Date(application.appliedAt).toLocaleDateString()}</p>
-                          {application.interview && (
-                            <div className="mt-2 p-2 bg-purple-50 rounded-lg">
-                              <p className="text-sm font-medium text-purple-800">Interview Scheduled</p>
-                              <p className="text-sm text-purple-600">
-                                {new Date(application.interview.date).toLocaleDateString()} at {application.interview.time}
-                              </p>
-                              <p className="text-sm text-purple-600">
-                                {application.interview.type} with {application.interview.interviewer}
-                              </p>
-                            </div>
-                          )}
+                          currentStatus={application?.status}
+                          onStatusChange={(newStatus) => handleStatusChange(application?.id, newStatus)}
+                          showActions={mode === 'edit'}
+                        />
+                        
+                        <div className="mt-3 flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleInterviewSchedule(application?.id)}
+                            className="text-primary-600 border-primary-200 hover:bg-primary-50"
+                          >
+                            <ApperIcon name="Calendar" className="w-4 h-4 mr-2" />
+                            Schedule Interview
+                          </Button>
                         </div>
                       </div>
+                    )) || []}
+                    
+                    {(!candidateApplications || candidateApplications.length === 0) && (
+                      <div className="text-center py-8 text-gray-500">
+                        <ApperIcon name="FileX" className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                        <p>No applications found for this candidate</p>
+                      </div>
                     )}
-                  </div>}
-                </div>}
+                  </div>
+                )}
               </div>
               
               {/* Footer */}
