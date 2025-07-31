@@ -294,12 +294,12 @@ Add Candidate
         onStatusChange={handleStatusChange}
       />
 
-      {/* Add Candidate Modal */}
+{/* Add Candidate Modal */}
 <CandidateProfileModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onSave={handleAddCandidate}
-        mode="create"
+        mode="add"
       />
     </div>
   );
