@@ -76,12 +76,21 @@ function CandidateProfileModal({
   }, [candidate, mode]);
 
   // Separate useEffect for applications to prevent re-render loops
-  useEffect(() => {
+useEffect(() => {
     // Only update if applications is defined and has changed meaningfully
     if (applications && Array.isArray(applications)) {
-      setCandidateApplications(applications);
+      // Deep comparison to prevent unnecessary updates that cause infinite re-renders
+      const currentAppsString = JSON.stringify(candidateApplications || []);
+      const newAppsString = JSON.stringify(applications);
+      
+      if (currentAppsString !== newAppsString) {
+        setCandidateApplications(applications);
+      }
+    } else if (!applications) {
+      // Clear applications if none provided
+      setCandidateApplications([]);
     }
-  }, [applications]);
+  }, [applications, candidateApplications]);
 
   // Handle null candidate case for view/edit modes after hooks are initialized
   if (!candidate && mode !== 'create') {
