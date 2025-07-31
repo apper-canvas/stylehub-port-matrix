@@ -57,6 +57,7 @@ function CandidateProfileModal({
   const [selectedApplicationId, setSelectedApplicationId] = useState(null);
   const [candidateApplications, setCandidateApplications] = useState(applications);
 
+// Separate useEffect for form data initialization to prevent infinite loops
   useEffect(() => {
     if (candidate && (mode === "view" || mode === "edit")) {
       setFormData({
@@ -72,8 +73,15 @@ function CandidateProfileModal({
         availability: candidate.availability || "available"
       });
     }
-    setCandidateApplications(applications);
-  }, [candidate, applications, mode]);
+  }, [candidate, mode]);
+
+  // Separate useEffect for applications to prevent re-render loops
+  useEffect(() => {
+    // Only update if applications is defined and has changed meaningfully
+    if (applications && Array.isArray(applications)) {
+      setCandidateApplications(applications);
+    }
+  }, [applications]);
 
   // Handle null candidate case for view/edit modes after hooks are initialized
   if (!candidate && mode !== 'create') {
