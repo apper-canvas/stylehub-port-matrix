@@ -36,12 +36,7 @@ function CandidateProfileModal({
   onApplicationUpdate,
   mode = 'view' // 'view', 'edit', 'create'
 }) {
-  // Early return if candidate is required but null (for view/edit modes)
-  if (!candidate && mode !== 'create') {
-    return null;
-  }
-
-// State management
+// State management - MUST be called before any conditional returns
   const [formData, setFormData] = useState({
     name: candidate?.name ?? '',
     email: candidate?.email ?? '',
@@ -79,7 +74,13 @@ function CandidateProfileModal({
     }
     setCandidateApplications(applications);
   }, [candidate, applications, mode]);
-const validateForm = () => {
+
+  // Handle null candidate case for view/edit modes after hooks are initialized
+  if (!candidate && mode !== 'create') {
+    return null;
+  }
+
+  const validateForm = () => {
     const newErrors = {};
     
     if (!formData.name.trim()) {
