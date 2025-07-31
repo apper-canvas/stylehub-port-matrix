@@ -75,8 +75,8 @@ function CandidateProfileModal({
     }
   }, [candidate, mode]);
 
-  // Separate useEffect for applications to prevent re-render loops
-useEffect(() => {
+// Separate useEffect for applications to prevent re-render loops
+  useEffect(() => {
     // Only update if applications is defined and has changed meaningfully
     if (applications && Array.isArray(applications)) {
       // Deep comparison to prevent unnecessary updates that cause infinite re-renders
@@ -91,12 +91,10 @@ useEffect(() => {
       setCandidateApplications([]);
     }
   }, [applications, candidateApplications]);
-
   // Handle null candidate case for view/edit modes after hooks are initialized
-  if (!candidate && mode !== 'create') {
+  if (!candidate && mode !== 'create' && mode !== 'add') {
     return null;
   }
-
   const validateForm = () => {
     const newErrors = {};
     
