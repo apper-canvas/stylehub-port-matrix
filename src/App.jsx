@@ -1,28 +1,23 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
-import Header from "@/components/organisms/Header";
-import Footer from "@/components/organisms/Footer";
-import Home from "@/components/pages/Home";
-import Category from "@/components/pages/Category";
-import ProductDetailPage from "@/components/pages/ProductDetailPage";
-import Search from "@/components/pages/Search";
-import Wishlist from "@/components/pages/Wishlist";
+import Layout from "@/components/organisms/Layout";
+import Dashboard from "@/components/pages/Dashboard";
+import Jobs from "@/components/pages/Jobs";
+import Candidates from "@/components/pages/Candidates";
+import Clients from "@/components/pages/Clients";
 
 function App() {
   return (
-    <Router>
-      <div className="min-h-screen bg-background">
-        <Header />
-        <main>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/category/:category" element={<Category />} />
-            <Route path="/product/:id" element={<ProductDetailPage />} />
-            <Route path="/search" element={<Search />} />
-            <Route path="/wishlist" element={<Wishlist />} />
-          </Routes>
-        </main>
-        <Footer />
+    <BrowserRouter>
+      <div className="min-h-screen bg-gray-50">
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="jobs" element={<Jobs />} />
+<Route path="candidates" element={<Candidates />} />
+            <Route path="clients" element={<Clients />} />
+          </Route>
+        </Routes>
         <ToastContainer
           position="top-right"
           autoClose={3000}
@@ -33,10 +28,10 @@ function App() {
           pauseOnFocusLoss
           draggable
           pauseOnHover
-          theme="light"
+          style={{ zIndex: 9999 }}
         />
       </div>
-    </Router>
+    </BrowserRouter>
   );
 }
 

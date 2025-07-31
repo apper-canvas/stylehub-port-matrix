@@ -1,23 +1,20 @@
-import { motion } from "framer-motion";
+import React from "react";
+import Button from "@/components/atoms/Button";
 import ApperIcon from "@/components/ApperIcon";
+import { cn } from "@/utils/cn";
 
-const Error = ({ message = "Something went wrong", onRetry }) => {
+const Error = ({ 
+  message = "Something went wrong. Please try again.", 
+  onRetry,
+  className 
+}) => {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-      className="flex flex-col items-center justify-center min-h-[400px] p-8 text-center"
-    >
-      <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-full p-4 mb-6">
-        <ApperIcon
-          name="AlertCircle"
-          size={48}
-          className="text-error"
-        />
+    <div className={cn("flex flex-col items-center justify-center py-12 px-6 text-center", className)}>
+      <div className="w-20 h-20 rounded-full bg-gradient-to-br from-red-100 to-red-200 flex items-center justify-center mb-6 shadow-lg">
+        <ApperIcon name="AlertTriangle" size={32} className="text-red-600" />
       </div>
       
-      <h3 className="text-xl font-semibold text-gray-800 mb-2">
+      <h3 className="text-xl font-semibold font-display text-gray-900 mb-2">
         Oops! Something went wrong
       </h3>
       
@@ -26,17 +23,15 @@ const Error = ({ message = "Something went wrong", onRetry }) => {
       </p>
       
       {onRetry && (
-        <motion.button
+        <Button 
           onClick={onRetry}
-          className="bg-gradient-to-r from-primary to-pink-500 text-white px-6 py-3 rounded-lg font-medium hover:from-pink-600 hover:to-primary transition-all duration-200 flex items-center gap-2"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+          className="flex items-center space-x-2"
         >
           <ApperIcon name="RefreshCw" size={16} />
-          Try Again
-        </motion.button>
+          <span>Try Again</span>
+        </Button>
       )}
-    </motion.div>
+    </div>
   );
 };
 

@@ -1,131 +1,76 @@
-import { motion } from "framer-motion";
+import React from "react";
+import { cn } from "@/utils/cn";
 
-const Loading = ({ type = "products" }) => {
-  const shimmerVariants = {
-    animate: {
-      backgroundPosition: ["0px 0px", "200px 0px"],
-      transition: {
-        duration: 1.5,
-        repeat: Infinity,
-        ease: "linear"
-      }
-    }
+const Loading = ({ className, variant = "default" }) => {
+  const variants = {
+    default: "space-y-6",
+    grid: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6",
+    list: "space-y-4"
   };
 
-  if (type === "products") {
-    return (
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-        {Array.from({ length: 12 }).map((_, index) => (
-          <div key={index} className="bg-white rounded-lg shadow-sm overflow-hidden">
-            <motion.div
-              className="h-48 md:h-64 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-shimmer"
-              variants={shimmerVariants}
-              animate="animate"
-              style={{ backgroundSize: "200px 100%" }}
-            />
-            <div className="p-4 space-y-3">
-              <motion.div
-                className="h-4 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-shimmer rounded"
-                variants={shimmerVariants}
-                animate="animate"
-                style={{ backgroundSize: "200px 100%" }}
-              />
-              <motion.div
-                className="h-3 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-shimmer rounded w-2/3"
-                variants={shimmerVariants}
-                animate="animate"
-                style={{ backgroundSize: "200px 100%" }}
-              />
-              <motion.div
-                className="h-4 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-shimmer rounded w-1/2"
-                variants={shimmerVariants}
-                animate="animate"
-                style={{ backgroundSize: "200px 100%" }}
-              />
-            </div>
+  const SkeletonCard = () => (
+    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+      <div className="animate-pulse">
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex-1">
+            <div className="h-6 bg-gradient-to-r from-gray-200 to-gray-300 rounded-lg mb-2"></div>
+            <div className="h-4 bg-gradient-to-r from-gray-200 to-gray-300 rounded-lg w-2/3 mb-3"></div>
+            <div className="h-6 bg-gradient-to-r from-blue-100 to-blue-200 rounded-full w-20"></div>
           </div>
+          <div className="w-12 h-12 bg-gradient-to-br from-primary-200 to-secondary-200 rounded-xl"></div>
+        </div>
+        <div className="space-y-2 mb-4">
+          <div className="h-3 bg-gradient-to-r from-gray-200 to-gray-300 rounded"></div>
+          <div className="h-3 bg-gradient-to-r from-gray-200 to-gray-300 rounded w-5/6"></div>
+        </div>
+        <div className="flex items-center justify-between">
+          <div className="h-3 bg-gradient-to-r from-gray-200 to-gray-300 rounded w-24"></div>
+          <div className="h-3 bg-gradient-to-r from-gray-200 to-gray-300 rounded w-20"></div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const SkeletonMetric = () => (
+    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+      <div className="animate-pulse">
+        <div className="flex items-center justify-between">
+          <div className="flex-1">
+            <div className="h-4 bg-gradient-to-r from-gray-200 to-gray-300 rounded-lg mb-2 w-24"></div>
+            <div className="h-8 bg-gradient-to-r from-gray-200 to-gray-300 rounded-lg mb-2 w-16"></div>
+            <div className="h-3 bg-gradient-to-r from-green-100 to-green-200 rounded w-32"></div>
+          </div>
+          <div className="w-14 h-14 bg-gradient-to-br from-primary-200 to-secondary-200 rounded-xl"></div>
+        </div>
+      </div>
+    </div>
+  );
+
+  if (variant === "grid") {
+    return (
+      <div className={cn(variants.grid, className)}>
+        {[...Array(6)].map((_, i) => (
+          <SkeletonCard key={i} />
         ))}
       </div>
     );
   }
 
-  if (type === "detail") {
+  if (variant === "metrics") {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Image Gallery Skeleton */}
-          <div className="space-y-4">
-            <motion.div
-              className="aspect-square bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-shimmer rounded-lg"
-              variants={shimmerVariants}
-              animate="animate"
-              style={{ backgroundSize: "200px 100%" }}
-            />
-            <div className="grid grid-cols-4 gap-2">
-              {Array.from({ length: 4 }).map((_, index) => (
-                <motion.div
-                  key={index}
-                  className="aspect-square bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-shimmer rounded-lg"
-                  variants={shimmerVariants}
-                  animate="animate"
-                  style={{ backgroundSize: "200px 100%" }}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* Product Info Skeleton */}
-          <div className="space-y-6">
-            <div className="space-y-3">
-              <motion.div
-                className="h-8 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-shimmer rounded w-3/4"
-                variants={shimmerVariants}
-                animate="animate"
-                style={{ backgroundSize: "200px 100%" }}
-              />
-              <motion.div
-                className="h-6 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-shimmer rounded w-1/2"
-                variants={shimmerVariants}
-                animate="animate"
-                style={{ backgroundSize: "200px 100%" }}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <motion.div
-                className="h-6 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-shimmer rounded w-1/3"
-                variants={shimmerVariants}
-                animate="animate"
-                style={{ backgroundSize: "200px 100%" }}
-              />
-              <div className="flex gap-2">
-                {Array.from({ length: 6 }).map((_, index) => (
-                  <motion.div
-                    key={index}
-                    className="w-10 h-10 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-shimmer rounded"
-                    variants={shimmerVariants}
-                    animate="animate"
-                    style={{ backgroundSize: "200px 100%" }}
-                  />
-                ))}
-              </div>
-            </div>
-
-            <motion.div
-              className="h-12 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-shimmer rounded-lg"
-              variants={shimmerVariants}
-              animate="animate"
-              style={{ backgroundSize: "200px 100%" }}
-            />
-          </div>
-        </div>
+      <div className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6", className)}>
+        {[...Array(4)].map((_, i) => (
+          <SkeletonMetric key={i} />
+        ))}
       </div>
     );
   }
 
   return (
-    <div className="flex items-center justify-center min-h-[400px]">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+    <div className={cn(variants[variant], className)}>
+      {[...Array(3)].map((_, i) => (
+        <SkeletonCard key={i} />
+      ))}
     </div>
   );
 };

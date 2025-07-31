@@ -6,29 +6,31 @@ export default {
   ],
   theme: {
     extend: {
-      colors: {
-        primary: '#FF3F6C',
-        secondary: '#282C3F',
-        accent: '#FF3F6C',
-        surface: '#FFFFFF',
-        background: '#FAFBFC',
-        success: '#03A685',
-        warning: '#FF9800',
-        error: '#F16565',
-        info: '#526BFF',
-      },
       fontFamily: {
-        'display': ['Bebas Neue', 'cursive'],
+        'display': ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
         'body': ['Inter', 'system-ui', 'sans-serif'],
       },
-      animation: {
-        'bounce-subtle': 'bounce 0.5s ease-in-out',
-        'shimmer': 'shimmer 2s linear infinite',
-      },
-      keyframes: {
-        shimmer: {
-          '0%': { backgroundPosition: '-200px 0' },
-          '100%': { backgroundPosition: 'calc(200px + 100%) 0' },
+      colors: {
+        primary: {
+          50: '#eef2ff',
+          100: '#e0e7ff',
+          500: '#4F46E5',
+          600: '#4338ca',
+          700: '#3730a3',
+        },
+        secondary: {
+          50: '#faf5ff',
+          100: '#f3e8ff',
+          500: '#7C3AED',
+          600: '#7c2d92',
+          700: '#6b21a8',
+        },
+        accent: {
+          50: '#ecfeff',
+          100: '#cffafe',
+          500: '#06B6D4',
+          600: '#0891b2',
+          700: '#0e7490',
         },
       },
     },
