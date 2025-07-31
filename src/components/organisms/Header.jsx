@@ -1,9 +1,13 @@
-import React from "react";
+import React, { useContext } from "react";
+import { useSelector } from "react-redux";
 import ApperIcon from "@/components/ApperIcon";
 import { useLocation } from "react-router-dom";
+import { AuthContext } from "../AppContent";
 
 const Header = ({ onMobileMenuToggle }) => {
   const location = useLocation();
+  const { logout } = useContext(AuthContext);
+  const { user } = useSelector((state) => state.user);
   
   const getPageTitle = () => {
     switch (location.pathname) {
@@ -13,8 +17,16 @@ const Header = ({ onMobileMenuToggle }) => {
         return "Jobs";
       case "/candidates":
         return "Candidates";
+      case "/clients":
+        return "Clients";
       default:
         return "Dashboard";
+    }
+  };
+
+  const handleLogout = async () => {
+    if (window.confirm('Are you sure you want to logout?')) {
+      await logout();
     }
   };
 
@@ -49,8 +61,20 @@ const Header = ({ onMobileMenuToggle }) => {
           <button className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
             <ApperIcon name="Settings" size={20} />
           </button>
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center shadow-lg">
-            <ApperIcon name="User" size={16} className="text-white" />
+          <div className="flex items-center space-x-3">
+            <span className="hidden md:block text-sm text-gray-600">
+              {user?.firstName || user?.name || 'User'}
+            </span>
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center shadow-lg">
+              <ApperIcon name="User" size={16} className="text-white" />
+            </div>
+            <button
+              onClick={handleLogout}
+              className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+              title="Logout"
+            >
+              <ApperIcon name="LogOut" size={18} />
+            </button>
           </div>
         </div>
       </div>

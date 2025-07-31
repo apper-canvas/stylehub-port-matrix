@@ -24,7 +24,7 @@ const [candidates, setCandidates] = useState([])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [selectedCandidate, setSelectedCandidate] = useState(null)
-const [modalMode, setModalMode] = useState('add')
+  const [modalMode, setModalMode] = useState('add')
 
   const statusOptions = [
     { value: 'all', label: 'All Candidates' },
@@ -105,8 +105,8 @@ function handleViewCandidate(candidate) {
   }
 
   // Helper function to determine candidate status from their applications
-  function getCandidateStatus(candidateId) {
-    const candidateApplications = applications.filter(app => app.candidateId === candidateId);
+function getCandidateStatus(candidateId) {
+    const candidateApplications = applications.filter(app => app.candidateId_c === candidateId);
     
     if (candidateApplications.length === 0) return 'new';
     
@@ -114,7 +114,7 @@ function handleViewCandidate(candidate) {
     const statusPriority = ['hired', 'rejected', 'final_review', 'interview_scheduled', 'screening', 'applied'];
     
     for (const status of statusPriority) {
-      if (candidateApplications.some(app => app.status === status)) {
+      if (candidateApplications.some(app => app.status_c === status)) {
         return status === 'applied' ? 'new' : 
                status === 'screening' ? 'interviewed' :
                status === 'interview_scheduled' ? 'interviewed' :
@@ -141,20 +141,20 @@ function handleViewCandidate(candidate) {
   }
 
 const getCandidateApplications = (candidateId) => {
-    const candidateApplications = applications.filter(app => app.candidateId === candidateId)
+    const candidateApplications = applications.filter(app => app.candidateId_c === candidateId)
     return candidateApplications.map(app => {
-      const job = jobs.find(job => job.Id === app.jobId)
+      const job = jobs.find(job => job.Id === app.jobId_c)
       return {
         ...app,
-        jobTitle: job?.title || 'Unknown Position'
+        jobTitle: job?.title_c || job?.Name || 'Unknown Position'
       }
     })
   }
 
-  const getAppliedJobsForCandidate = (candidateId) => {
-    const candidateApplications = applications.filter(app => app.candidateId === candidateId)
+const getAppliedJobsForCandidate = (candidateId) => {
+    const candidateApplications = applications.filter(app => app.candidateId_c === candidateId)
     return candidateApplications.map(app => 
-      jobs.find(job => job.Id === app.jobId)
+      jobs.find(job => job.Id === app.jobId_c)
     ).filter(Boolean)
   }
 
@@ -181,9 +181,9 @@ function getStatusCounts() {
   
 const filteredCandidates = candidates.filter(candidate => {
     const matchesSearch = !searchTerm || 
-      candidate.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      candidate.position?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      candidate.skills?.some(skill => skill.toLowerCase().includes(searchTerm.toLowerCase()))
+      candidate.Name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      candidate.position_c?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      candidate.skills_c?.split(',').some(skill => skill.toLowerCase().includes(searchTerm.toLowerCase()))
     
     const candidateStatus = getCandidateStatus(candidate.Id);
     const matchesStatus = statusFilter === 'all' || candidateStatus === statusFilter;

@@ -1,238 +1,533 @@
-import applicationsData from "@/services/mockData/applications.json";
-
-function delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-const applications = [...applicationsData];
-let nextId = Math.max(...applications.map(app => app.Id), 0) + 1;
+const tableName = 'application_c';
 
 export const applicationService = {
   async getAll() {
-    await delay(300);
-    return [...applications];
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
+
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "Tags" } },
+          { field: { Name: "Owner" } },
+          { field: { Name: "jobId_c" } },
+          { field: { Name: "candidateId_c" } },
+          { field: { Name: "appliedAt_c" } },
+          { field: { Name: "status_c" } },
+          { field: { Name: "notes_c" } },
+          { field: { Name: "interview_c" } }
+        ],
+        orderBy: [
+          { fieldName: "appliedAt_c", sorttype: "DESC" }
+        ]
+      };
+
+      const response = await apperClient.fetchRecords(tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        return [];
+      }
+
+      return response.data || [];
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error fetching applications:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return [];
+    }
   },
 
   async getById(id) {
-    await delay(200);
-    if (typeof id !== 'number') {
-      throw new Error('Application ID must be a number');
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
+
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "Tags" } },
+          { field: { Name: "Owner" } },
+          { field: { Name: "jobId_c" } },
+          { field: { Name: "candidateId_c" } },
+          { field: { Name: "appliedAt_c" } },
+          { field: { Name: "status_c" } },
+          { field: { Name: "notes_c" } },
+          { field: { Name: "interview_c" } }
+        ]
+      };
+
+      const response = await apperClient.getRecordById(tableName, parseInt(id), params);
+      
+      if (!response || !response.data) {
+        return null;
+      }
+
+      return response.data;
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error(`Error fetching application with ID ${id}:`, error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return null;
     }
-    
-    const application = applications.find(app => app.Id === id);
-    if (!application) {
-      throw new Error('Application not found');
-    }
-    
-    return { ...application };
   },
 
   async getByJobId(jobId) {
-    await delay(200);
-    if (typeof jobId !== 'number') {
-      throw new Error('Job ID must be a number');
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
+
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "jobId_c" } },
+          { field: { Name: "candidateId_c" } },
+          { field: { Name: "appliedAt_c" } },
+          { field: { Name: "status_c" } },
+          { field: { Name: "notes_c" } },
+          { field: { Name: "interview_c" } }
+        ],
+        where: [
+          {
+            FieldName: "jobId_c",
+            Operator: "EqualTo",
+            Values: [parseInt(jobId)]
+          }
+        ]
+      };
+
+      const response = await apperClient.fetchRecords(tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        return [];
+      }
+
+      return response.data || [];
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error fetching applications by job ID:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return [];
     }
-    
-    return applications
-      .filter(app => app.jobId === jobId)
-      .map(app => ({ ...app }));
   },
 
   async getByCandidateId(candidateId) {
-    await delay(200);
-    if (typeof candidateId !== 'number') {
-      throw new Error('Candidate ID must be a number');
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
+
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "jobId_c" } },
+          { field: { Name: "candidateId_c" } },
+          { field: { Name: "appliedAt_c" } },
+          { field: { Name: "status_c" } },
+          { field: { Name: "notes_c" } },
+          { field: { Name: "interview_c" } }
+        ],
+        where: [
+          {
+            FieldName: "candidateId_c",
+            Operator: "EqualTo",
+            Values: [parseInt(candidateId)]
+          }
+        ]
+      };
+
+      const response = await apperClient.fetchRecords(tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        return [];
+      }
+
+      return response.data || [];
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error fetching applications by candidate ID:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return [];
     }
-    
-    return applications
-      .filter(app => app.candidateId === candidateId)
-      .map(app => ({ ...app }));
   },
 
   async create(applicationData) {
-    await delay(500);
-    
-    // Validate required fields
-    if (!applicationData.jobId || !applicationData.candidateId) {
-      throw new Error('Job ID and Candidate ID are required');
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
+
+      const params = {
+        records: [
+          {
+            Name: applicationData.Name || `Application ${Date.now()}`,
+            Tags: applicationData.Tags || "",
+            jobId_c: parseInt(applicationData.jobId_c),
+            candidateId_c: parseInt(applicationData.candidateId_c),
+            appliedAt_c: new Date().toISOString(),
+            status_c: applicationData.status_c || 'applied',
+            notes_c: applicationData.notes_c || '',
+            interview_c: applicationData.interview_c || ''
+          }
+        ]
+      };
+
+      const response = await apperClient.createRecord(tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        throw new Error(response.message);
+      }
+
+      if (response.results) {
+        const successfulRecords = response.results.filter(result => result.success);
+        const failedRecords = response.results.filter(result => !result.success);
+        
+        if (failedRecords.length > 0) {
+          console.error(`Failed to create application ${failedRecords.length} records:${JSON.stringify(failedRecords)}`);
+          
+          failedRecords.forEach(record => {
+            record.errors?.forEach(error => {
+              throw new Error(`${error.fieldLabel}: ${error.message}`);
+            });
+            if (record.message) throw new Error(record.message);
+          });
+        }
+        
+        return successfulRecords.length > 0 ? successfulRecords[0].data : null;
+      }
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error creating application:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      throw error;
     }
-
-    // Check if application already exists
-    const existingApp = applications.find(
-      app => app.jobId === applicationData.jobId && app.candidateId === applicationData.candidateId
-    );
-    
-    if (existingApp) {
-      throw new Error('Candidate has already been applied to this job');
-    }
-
-const newApplication = {
-      Id: nextId++,
-      jobId: applicationData.jobId,
-      candidateId: applicationData.candidateId,
-      appliedAt: new Date().toISOString(),
-status: 'applied',
-      notes: applicationData.notes || '',
-      notesCount: 0
-    };
-
-    applications.push(newApplication);
-    return { ...newApplication };
   },
 
-  // Update application status
-async updateStatus(applicationId, newStatus) {
-    await delay(300);
-    
-    // Validate application ID
-    if (!applicationId || typeof applicationId !== 'number') {
-      throw new Error('Invalid application ID');
-    }
-    
-    const validStatuses = ['applied', 'screening', 'interview_scheduled', 'final_review', 'hired', 'rejected'];
-    if (!validStatuses.includes(newStatus)) {
-      throw new Error(`Invalid status: ${newStatus}. Valid statuses are: ${validStatuses.join(', ')}`);
-    }
+  async updateStatus(applicationId, newStatus) {
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
 
-    const applicationIndex = applications.findIndex(app => app.Id === applicationId);
-    if (applicationIndex === -1) {
-      throw new Error(`Application with ID ${applicationId} not found`);
-    }
+      const params = {
+        records: [
+          {
+            Id: parseInt(applicationId),
+            status_c: newStatus
+          }
+        ]
+      };
 
-    // Update the application status and timestamp
-    applications[applicationIndex].status = newStatus;
-    applications[applicationIndex].updatedAt = new Date().toISOString();
-    
-    return { ...applications[applicationIndex] };
+      const response = await apperClient.updateRecord(tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        throw new Error(response.message);
+      }
+
+      if (response.results) {
+        const successfulUpdates = response.results.filter(result => result.success);
+        const failedUpdates = response.results.filter(result => !result.success);
+        
+        if (failedUpdates.length > 0) {
+          console.error(`Failed to update application ${failedUpdates.length} records:${JSON.stringify(failedUpdates)}`);
+          
+          failedUpdates.forEach(record => {
+            record.errors?.forEach(error => {
+              throw new Error(`${error.fieldLabel}: ${error.message}`);
+            });
+            if (record.message) throw new Error(record.message);
+          });
+        }
+        
+        return successfulUpdates.length > 0 ? successfulUpdates[0].data : null;
+      }
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error updating application status:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      throw error;
+    }
   },
 
   async update(id, applicationData) {
-    await delay(400);
-    
-    if (typeof id !== 'number') {
-      throw new Error('Application ID must be a number');
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
+
+      const updateData = {
+        Id: parseInt(id)
+      };
+
+      // Only include updateable fields
+      if (applicationData.Name !== undefined) updateData.Name = applicationData.Name;
+      if (applicationData.Tags !== undefined) updateData.Tags = applicationData.Tags;
+      if (applicationData.jobId_c !== undefined) updateData.jobId_c = parseInt(applicationData.jobId_c);
+      if (applicationData.candidateId_c !== undefined) updateData.candidateId_c = parseInt(applicationData.candidateId_c);
+      if (applicationData.appliedAt_c !== undefined) updateData.appliedAt_c = applicationData.appliedAt_c;
+      if (applicationData.status_c !== undefined) updateData.status_c = applicationData.status_c;
+      if (applicationData.notes_c !== undefined) updateData.notes_c = applicationData.notes_c;
+      if (applicationData.interview_c !== undefined) updateData.interview_c = applicationData.interview_c;
+
+      const params = {
+        records: [updateData]
+      };
+
+      const response = await apperClient.updateRecord(tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        throw new Error(response.message);
+      }
+
+      if (response.results) {
+        const successfulUpdates = response.results.filter(result => result.success);
+        const failedUpdates = response.results.filter(result => !result.success);
+        
+        if (failedUpdates.length > 0) {
+          console.error(`Failed to update application ${failedUpdates.length} records:${JSON.stringify(failedUpdates)}`);
+          
+          failedUpdates.forEach(record => {
+            record.errors?.forEach(error => {
+              throw new Error(`${error.fieldLabel}: ${error.message}`);
+            });
+            if (record.message) throw new Error(record.message);
+          });
+        }
+        
+        return successfulUpdates.length > 0 ? successfulUpdates[0].data : null;
+      }
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error updating application:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      throw error;
     }
-
-    const index = applications.findIndex(app => app.Id === id);
-    if (index === -1) {
-      throw new Error('Application not found');
-    }
-
-    const updatedApplication = {
-      ...applications[index],
-      ...applicationData,
-      Id: applications[index].Id // Preserve original ID
-    };
-
-    applications[index] = updatedApplication;
-    return { ...updatedApplication };
   },
 
   async delete(id) {
-    await delay(300);
-    
-    if (typeof id !== 'number') {
-      throw new Error('Application ID must be a number');
-    }
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
 
-    const index = applications.findIndex(app => app.Id === id);
-    if (index === -1) {
-      throw new Error('Application not found');
-    }
+      const params = {
+        RecordIds: [parseInt(id)]
+      };
 
-    const deletedApplication = { ...applications[index] };
-    applications.splice(index, 1);
-    return deletedApplication;
+      const response = await apperClient.deleteRecord(tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        throw new Error(response.message);
+      }
+
+      if (response.results) {
+        const successfulDeletions = response.results.filter(result => result.success);
+        const failedDeletions = response.results.filter(result => !result.success);
+        
+        if (failedDeletions.length > 0) {
+          console.error(`Failed to delete application ${failedDeletions.length} records:${JSON.stringify(failedDeletions)}`);
+          
+          failedDeletions.forEach(record => {
+            if (record.message) throw new Error(record.message);
+          });
+        }
+        
+        return successfulDeletions.length > 0;
+      }
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error deleting application:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      throw error;
+    }
   },
 
-async checkApplication(jobId, candidateId) {
-    await delay(100);
-    
-    return applications.find(
-      app => app.jobId === jobId && app.candidateId === candidateId
-    ) || null;
+  async checkApplication(jobId, candidateId) {
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
+
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "jobId_c" } },
+          { field: { Name: "candidateId_c" } }
+        ],
+        where: [
+          {
+            FieldName: "jobId_c",
+            Operator: "EqualTo",
+            Values: [parseInt(jobId)]
+          }
+        ],
+        whereGroups: [
+          {
+            operator: "AND",
+            subGroups: [
+              {
+                conditions: [
+                  {
+                    fieldName: "candidateId_c",
+                    operator: "EqualTo",
+                    values: [parseInt(candidateId)]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      };
+
+      const response = await apperClient.fetchRecords(tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        return null;
+      }
+
+      return response.data && response.data.length > 0 ? response.data[0] : null;
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error checking application:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return null;
+    }
   },
 
-  // Schedule interview for an application
   async scheduleInterview(applicationId, interviewData) {
-    await delay(400);
-    
-    if (typeof applicationId !== 'number') {
-      throw new Error('Application ID must be a number');
+    try {
+      const interviewText = JSON.stringify(interviewData);
+      return await this.update(parseInt(applicationId), {
+        interview_c: interviewText,
+        status_c: 'interview_scheduled'
+      });
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error scheduling interview:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      throw error;
     }
-
-    const applicationIndex = applications.findIndex(app => app.Id === applicationId);
-    if (applicationIndex === -1) {
-      throw new Error('Application not found');
-    }
-
-    // Validate interview data
-    const { date, time, interviewer, type, notes } = interviewData;
-    if (!date || !time || !interviewer || !type) {
-      throw new Error('Date, time, interviewer, and type are required');
-    }
-
-    const validTypes = ['Phone', 'Video', 'In-person'];
-    if (!validTypes.includes(type)) {
-      throw new Error('Invalid interview type');
-    }
-
-    applications[applicationIndex].interview = {
-      date,
-      time,
-      interviewer,
-      type,
-      notes: notes || ''
-    };
-
-    // Ensure status is interview_scheduled
-    applications[applicationIndex].status = 'interview_scheduled';
-
-    return { ...applications[applicationIndex] };
   },
 
-  // Update interview details
   async updateInterview(applicationId, interviewData) {
-    await delay(400);
-    
-    if (typeof applicationId !== 'number') {
-      throw new Error('Application ID must be a number');
+    try {
+      const interviewText = JSON.stringify(interviewData);
+      return await this.update(parseInt(applicationId), {
+        interview_c: interviewText
+      });
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error updating interview:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      throw error;
     }
-
-    const applicationIndex = applications.findIndex(app => app.Id === applicationId);
-    if (applicationIndex === -1) {
-      throw new Error('Application not found');
-    }
-
-    if (!applications[applicationIndex].interview) {
-      throw new Error('No interview scheduled for this application');
-    }
-
-    applications[applicationIndex].interview = {
-      ...applications[applicationIndex].interview,
-      ...interviewData
-    };
-
-    return { ...applications[applicationIndex] };
   },
 
-  // Get upcoming interviews
   async getUpcomingInterviews() {
-    await delay(200);
-    
-    const now = new Date();
-    const upcomingInterviews = applications
-      .filter(app => app.interview && app.status === 'interview_scheduled')
-      .map(app => ({
-        ...app,
-        interviewDateTime: new Date(`${app.interview.date}T${app.interview.time}`)
-      }))
-      .filter(app => app.interviewDateTime >= now)
-      .sort((a, b) => a.interviewDateTime - b.interviewDateTime);
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
 
-    return upcomingInterviews.map(app => {
-      const { interviewDateTime, ...rest } = app;
-      return rest;
-    });
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "jobId_c" } },
+          { field: { Name: "candidateId_c" } },
+          { field: { Name: "status_c" } },
+          { field: { Name: "interview_c" } }
+        ],
+        where: [
+          {
+            FieldName: "status_c",
+            Operator: "EqualTo",
+            Values: ["interview_scheduled"]
+          }
+        ],
+        orderBy: [
+          { fieldName: "appliedAt_c", sorttype: "ASC" }
+        ]
+      };
+
+      const response = await apperClient.fetchRecords(tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        return [];
+      }
+
+      const interviews = response.data || [];
+      return interviews.filter(app => app.interview_c).map(app => {
+        try {
+          const interview = JSON.parse(app.interview_c);
+          return {
+            ...app,
+            interview
+          };
+        } catch {
+          return app;
+        }
+      });
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error fetching upcoming interviews:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return [];
+    }
   }
 };

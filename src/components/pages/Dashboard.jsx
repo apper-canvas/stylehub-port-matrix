@@ -12,10 +12,10 @@ import Jobs from "@/components/pages/Jobs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/atoms/Card";
 
 const Dashboard = () => {
-  const [metrics, setMetrics] = useState({
+const [metrics, setMetrics] = useState({
     totalJobs: 0,
     totalCandidates: 0,
-activeJobs: 0,
+    activeJobs: 0,
     newCandidates: 0
   });
   const [recentJobs, setRecentJobs] = useState([]);
@@ -23,8 +23,8 @@ activeJobs: 0,
   const [upcomingInterviews, setUpcomingInterviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const loadDashboardData = async () => {
-try {
+const loadDashboardData = async () => {
+    try {
       setLoading(true);
       setError("");
       
@@ -35,9 +35,9 @@ try {
       ]);
 
       // Calculate metrics
-      const activeJobs = jobs.filter(job => job.status === "active").length;
+      const activeJobs = jobs.filter(job => job.status_c === "active").length;
       const newCandidates = candidates.filter(candidate => {
-        const appliedDate = new Date(candidate.appliedAt);
+        const appliedDate = new Date(candidate.appliedAt_c);
         const weekAgo = new Date();
         weekAgo.setDate(weekAgo.getDate() - 7);
         return appliedDate >= weekAgo;
@@ -61,10 +61,10 @@ try {
       setLoading(false);
     }
   };
+  
   useEffect(() => {
     loadDashboardData();
   }, []);
-
   if (loading) {
     return (
       <div className="space-y-8">
@@ -121,25 +121,25 @@ try {
             </CardHeader>
             <CardContent>
                 <div className="space-y-4">
-                    {recentJobs.map(job => <div
+{recentJobs.map(job => <div
                         key={job.Id}
                         className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg border border-gray-100 hover:shadow-md transition-all duration-200">
                         <div className="flex-1">
-                            <h4 className="font-semibold text-gray-900 mb-1">{job.title}</h4>
-                            <p className="text-sm text-gray-600 mb-2">{job.company}</p>
+                            <h4 className="font-semibold text-gray-900 mb-1">{job.title_c || job.Name}</h4>
+                            <p className="text-sm text-gray-600 mb-2">{job.company_c}</p>
                             <div className="flex items-center space-x-3">
                                 <span
-                                    className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${job.status === "active" ? "bg-green-100 text-green-800" : job.status === "draft" ? "bg-yellow-100 text-yellow-800" : "bg-gray-100 text-gray-800"}`}>
-                                    {job.status}
+                                    className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${job.status_c === "active" ? "bg-green-100 text-green-800" : job.status_c === "draft" ? "bg-yellow-100 text-yellow-800" : "bg-gray-100 text-gray-800"}`}>
+                                    {job.status_c}
                                 </span>
                                 <span className="text-xs text-gray-500">
-                                    {job.applicants} applicants
-                                                          </span>
+                                    {job.applicants_c || 0} applicants
+                                </span>
                             </div>
                         </div>
                         <div className="text-right">
                             <p className="text-xs text-gray-500">
-                                {format(new Date(job.createdAt), "MMM d")}
+                                {format(new Date(job.createdAt_c), "MMM d")}
                             </p>
                         </div>
                     </div>)}
@@ -155,7 +155,7 @@ try {
                                 </CardTitle>
             </CardHeader>
             <CardContent>
-                <div className="space-y-4">
+<div className="space-y-4">
                     {recentCandidates.map(candidate => <div
                         key={candidate.Id}
                         className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg border border-gray-100 hover:shadow-md transition-all duration-200">
@@ -163,21 +163,21 @@ try {
                             <div
                                 className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center shadow-lg">
                                 <span className="text-white font-semibold text-sm">
-                                    {candidate.name.charAt(0).toUpperCase()}
+                                    {(candidate.Name || candidate.name)?.charAt(0).toUpperCase()}
                                 </span>
                             </div>
                             <div className="flex-1">
-                                <h4 className="font-semibold text-gray-900">{candidate.name}</h4>
-                                <p className="text-sm text-gray-600 mb-1">{candidate.position}</p>
+                                <h4 className="font-semibold text-gray-900">{candidate.Name || candidate.name}</h4>
+                                <p className="text-sm text-gray-600 mb-1">{candidate.position_c}</p>
                                 <span
-                                    className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${candidate.status === "new" ? "bg-blue-100 text-blue-800" : candidate.status === "interviewed" ? "bg-purple-100 text-purple-800" : candidate.status === "hired" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
-                                    {candidate.status}
+                                    className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${candidate.status_c === "new" ? "bg-blue-100 text-blue-800" : candidate.status_c === "interviewed" ? "bg-purple-100 text-purple-800" : candidate.status_c === "hired" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
+                                    {candidate.status_c}
                                 </span>
                             </div>
                         </div>
                         <div className="text-right">
                             <p className="text-xs text-gray-500">
-                                {format(new Date(candidate.appliedAt), "MMM d")}
+                                {format(new Date(candidate.appliedAt_c), "MMM d")}
                             </p>
                         </div>
                     </div>)}

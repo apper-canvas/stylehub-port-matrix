@@ -69,8 +69,8 @@ function Clients() {
     }
   }
 
-  async function handleDeleteClient(client) {
-    if (window.confirm(`Are you sure you want to delete ${client.companyName}?`)) {
+async function handleDeleteClient(client) {
+    if (window.confirm(`Are you sure you want to delete ${client.companyName_c || client.Name}?`)) {
       try {
         await clientService.delete(client.Id)
         setClients(prev => prev.filter(c => c.Id !== client.Id))
@@ -82,13 +82,13 @@ function Clients() {
     }
   }
 
-  const filteredClients = clients.filter(client => {
+const filteredClients = clients.filter(client => {
     const searchLower = searchTerm.toLowerCase()
-    const matchesSearch = client.companyName.toLowerCase().includes(searchLower) ||
-                         client.contactPerson.toLowerCase().includes(searchLower) ||
-                         client.email.toLowerCase().includes(searchLower)
+    const matchesSearch = (client.companyName_c || client.Name)?.toLowerCase().includes(searchLower) ||
+                         client.contactPerson_c?.toLowerCase().includes(searchLower) ||
+                         client.email_c?.toLowerCase().includes(searchLower)
     
-    const matchesStatus = statusFilter === 'all' || client.relationshipStatus === statusFilter
+    const matchesStatus = statusFilter === 'all' || client.relationshipStatus_c === statusFilter
     
     return matchesSearch && matchesStatus
   })
@@ -233,20 +233,20 @@ function Clients() {
         />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredClients.map((client) => (
+{filteredClients.map((client) => (
             <Card key={client.Id} className="hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02]">
               <CardContent className="p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <h3 className="text-lg font-semibold font-display text-gray-900 mb-1">
-                      {client.companyName}
+                      {client.companyName_c || client.Name}
                     </h3>
                     <div className="flex items-center text-sm text-gray-600 mb-2">
                       <ApperIcon name="User" size={14} className="mr-1" />
-                      {client.contactPerson}
+                      {client.contactPerson_c}
                     </div>
-                    <Badge variant={getStatusVariant(client.relationshipStatus)}>
-                      {client.relationshipStatus}
+                    <Badge variant={getStatusVariant(client.relationshipStatus_c)}>
+                      {client.relationshipStatus_c}
                     </Badge>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -268,15 +268,15 @@ function Clients() {
                 <div className="space-y-2 text-sm text-gray-600">
                   <div className="flex items-center">
                     <ApperIcon name="Mail" size={14} className="mr-2 text-gray-400" />
-                    <span className="truncate">{client.email}</span>
+                    <span className="truncate">{client.email_c}</span>
                   </div>
                   <div className="flex items-center">
                     <ApperIcon name="Phone" size={14} className="mr-2 text-gray-400" />
-                    <span>{client.phone}</span>
+                    <span>{client.phone_c}</span>
                   </div>
                   <div className="flex items-start">
                     <ApperIcon name="MapPin" size={14} className="mr-2 mt-0.5 text-gray-400 flex-shrink-0" />
-                    <span className="line-clamp-2">{client.address}</span>
+                    <span className="line-clamp-2">{client.address_c}</span>
                   </div>
                 </div>
               </CardContent>

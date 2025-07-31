@@ -1,23 +1,18 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import React, { createContext, useEffect, useState } from "react";
+import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
+import { Provider } from "react-redux";
+import { store } from "@/store/store";
 import { ToastContainer } from "react-toastify";
-import Layout from "@/components/organisms/Layout";
-import Dashboard from "@/components/pages/Dashboard";
-import Jobs from "@/components/pages/Jobs";
-import Candidates from "@/components/pages/Candidates";
-import Clients from "@/components/pages/Clients";
+import AppContent from "@/components/AppContent";
+import "@/index.css";
 
-function App() {
+export const AuthContext = createContext(null);
+
+function AppRoot() {
   return (
-    <BrowserRouter>
-      <div className="min-h-screen bg-gray-50">
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Dashboard />} />
-            <Route path="jobs" element={<Jobs />} />
-<Route path="candidates" element={<Candidates />} />
-            <Route path="clients" element={<Clients />} />
-          </Route>
-        </Routes>
+    <Provider store={store}>
+      <BrowserRouter>
+        <AppContent />
         <ToastContainer
           position="top-right"
           autoClose={3000}
@@ -30,9 +25,9 @@ function App() {
           pauseOnHover
           style={{ zIndex: 9999 }}
         />
-      </div>
-    </BrowserRouter>
-  );
+      </BrowserRouter>
+    </Provider>
+);
 }
 
-export default App;
+export default AppRoot;
